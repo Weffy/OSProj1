@@ -1,3 +1,12 @@
+/*
+ * CMP342: Operating Systems
+ * Project #1
+ * 
+ * Collaborators: 
+ * Krirk Pongsema
+ * Larry Blanco
+ */
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
