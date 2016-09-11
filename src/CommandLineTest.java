@@ -21,13 +21,6 @@ public class CommandLineTest {
 			//which signifies how often to print the string
 			int count = Integer.parseInt(args[0]);	
 			printMiddle(count);
-		} else if (args.length == 3) {
-			//if there are three parameters
-			//both flags will exist, and there is an integer to signal how often to print middle
-			System.out.println("Starting...");
-			int count = Integer.parseInt(args[2]);	
-			printMiddle(count);
-			System.out.println("Ending...");
 		} else if (args.length == 2) {
 			//if there are only two parameters
 			//need to ascertain which flag is present...s or e.
@@ -43,6 +36,15 @@ public class CommandLineTest {
 				printMiddle(count);
 				System.out.println("Ending...");
 			}
+		} else if (args.length == 3) {
+			//if there are three parameters
+			//both flags will exist, and there is an integer to signal how often to print middle
+			//dont need to check the ordering of the s and e flags because we already know both are present
+			//and that is all we need.
+			System.out.println("Starting...");
+			int count = Integer.parseInt(args[2]);	
+			printMiddle(count);
+			System.out.println("Ending...");
 		} 
 		
 
