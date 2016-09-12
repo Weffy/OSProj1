@@ -6,6 +6,6 @@ Project #1
 
 Todo:
 
-1) Part III
+1) Part III: Batch Mode
 2) Clean up commented out code
 3) Double check if everything is commented properly 
