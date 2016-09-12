@@ -47,8 +47,29 @@ public class CommandLineTest {
 			System.out.println("Ending...");
 		} 
 		
+		
 
 	}
+	
+	
+//	public static void main(String[] args) { 
+//		int count = args.length;
+//		switch (count) {
+//		case 0:
+//			noParam();
+//		case 1:  
+//			oneParam();
+//		case 2: 
+//			twoParam();
+//		case 3:
+//			threeParam();
+//		}
+//	}
+//	
+//	public static void noParam() {
+//		
+//	}
+	
 	public static void printMiddle(int num) {
 		for (int i = 0; i < num; i++) {
 			System.out.println("middle");
