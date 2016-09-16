@@ -10,7 +10,12 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Scanner;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+
+
 
 public class MyShell {
 
@@ -18,6 +23,7 @@ public class MyShell {
 		Process p = null;
 		BufferedReader inStream = new BufferedReader( new InputStreamReader( System.in ) );
 		BufferedReader outStream;
+		String [] batchParser;
 		while ( true ) {
 			System.out.println("prompt>");
 			String input = null;
@@ -27,27 +33,43 @@ public class MyShell {
 			 */
 			input = getInput(inStream);
 			if (input == null) {
-//					System.out.println(input);
 				continue;
 			}
 			/*
 			 * Check if exit condition exists
 			 */
 			exitCheck(input);
-
+			
+			
 			/*
 			 * If we get here, exit condition was not found...
 			 * moving on to running the command
 			 */
 			p = runProcess(input, p);
-			if ( p == null ) {
+			/*
+			 * batchParser will check if there is a batch file call
+			 * splits it into two parts using the space as the delimeter
+			 * first part is the potential batch command
+			 * second is the potential file name
+			 */
+			batchParser = input.split(" ");
+			if(batchParser.length == 2){
+				batch(batchParser[0], batchParser[1], p);
 				continue;
 			}
+			if ( p == null ) {
+				//if the process is null, return to the top of the loop and start again
+				continue;
+			}
+			
 			/*
 			 * Extract data from process object
 			 */
 			outStream = new BufferedReader( new InputStreamReader( p.getInputStream() ) );
 			extract(p, outStream);
+			
+		
+			
 			
 
 		}
@@ -57,57 +79,24 @@ public class MyShell {
 	 * If the try fails, method will return NULL
 	 */
 	public static String getInput(BufferedReader inStream) {
-//		BufferedReader inStream = new BufferedReader( new InputStreamReader( System.in ) );
-//		try {
-//			
-//			System.out.println(inStream.ready());
-//		} catch (IOException e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		}
 		try {
 			String userInput = inStream.readLine().trim();
 			if (userInput == null || userInput.length() == 0) {
-//				return null;
-//				System.out.println("if block");
+
 				
 			} else {
-//				System.out.println("else block");
-				
 				return userInput;
 			}
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+
 			e.printStackTrace();
 			System.out.println("...");
 			Runtime.getRuntime().exit(0);
 			return null;
 		}
-//		try {
-//			inStream.close();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			System.out.println("Stuff");
-//			e.printStackTrace();
-//			
-//		}
+
 		return null;
-		
-		
-		
-//		Scanner scanner = new Scanner(System.in);
-//		String userInput = null;
-//		if ( scanner.hasNextLine() ) {
-//			userInput = scanner.nextLine();
-//		}
-//		
-//		if (userInput.length() != 0 && userInput != null) {
-//			
-//			return userInput;
-//		}
-//		scanner.close();
-//		return null;
 
 	}
 	
@@ -121,10 +110,7 @@ public class MyShell {
 		if ( input.toLowerCase().equals("exit") ) {
 			System.out.println("Exiting...");
 			Runtime.getRuntime().exit(0);
-		} /*else if ( input.length() == 0 || input == null ) {
-			System.out.println("Exiting...");
-			Runtime.getRuntime().exit(0);
-		} */
+		} 
 		
 		
 	}
@@ -137,15 +123,14 @@ public class MyShell {
 			p = Runtime.getRuntime().exec(input);
 			p.waitFor();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			System.out.println("Error executing: " + input);
 			p = null;
-//				e.printStackTrace();
+
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+
 			System.out.println("Error executing: " + input);
 			p = null;
-//				e.printStackTrace();
+
 		}
 		return p;
 	}
@@ -161,11 +146,39 @@ public class MyShell {
 				  System.out.println(extract);
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-//				e.printStackTrace();
-			}
+			System.out.println("Failed to extract data from process object...");	
+		}
 
 	}
-		
+	
+	/*
+	 * if input = batch, then read the lines into a list
+	 * for each line in the list lines, run all of the same commands we ran in the main...
+	 */
+	public static void batch(String input, String filename, Process p) {
+		BufferedReader outStream;
+		if(input.equals("batch")){
+			List<String> lines;
+			try {
+				lines = Files.readAllLines(Paths.get(filename), StandardCharsets.UTF_8);
+				for( String line:lines){
+					exitCheck(line);
+					p = runProcess(line, p);
+					if ( p == null ) {
+						continue;
+					}
+					outStream = new BufferedReader( new InputStreamReader( p.getInputStream() ) );
+					extract(p, outStream);
+				}
+				
+			} catch (IOException e) {
+				
+			}
+			
+			
+		}
+	}	
+	
+
 
 }
